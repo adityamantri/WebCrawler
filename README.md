@@ -12,4 +12,7 @@ It will prompt you to
 1. Enter the URL
 2. No of pages you want to crawl
 
+## Steps to Run Test
+run cmd: python3 runTest.py
+
 Note: Python 3 is required to run the file
