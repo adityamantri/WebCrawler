@@ -5,7 +5,7 @@ from urllib.parse import urlparse, urljoin
 from concurrent.futures import ThreadPoolExecutor
 
 class Crawler:
-
+    # constructor will initialize the variables
     def __init__(self, base_url, limit):
         self.limit = int(limit)
         self.base_url = base_url
@@ -14,7 +14,9 @@ class Crawler:
         self.pool = ThreadPoolExecutor(max_workers=15)
         self.crawl_queue = Queue()
         self.crawl_queue.put(self.base_url)
-
+    
+    # links_parser function parse the html of that link using BeautifulSoup
+    # get the <a href=?> out of it and create a link to add it the queue
     def links_parser(self, html):
         soup = BeautifulSoup(html, 'html.parser')
         links = soup.find_all('a', href=True)
@@ -26,6 +28,7 @@ class Crawler:
                     self.crawl_queue.put(url)
                     print("     "+url)  
 
+    # scrape_function returns res object if request to URL is successful
     def scrape_page(self, url):
         try:
             res = requests.get(url, timeout=(3, 30))
@@ -33,11 +36,15 @@ class Crawler:
         except requests.RequestException:
             return
     
+    # callback function to utilize multi-threading
     def after_scrape_callback(self, res):
         result = res.result()
         if result and result.status_code == 200:
             self.links_parser(result.text)
 
+    # run_crawler binds all logic together. 
+    # It fetches the URL from the queue and add it to the visited set
+    # before submitting it to Thread pool
     def run_crawler(self):
         while self.limit > 0:
             try:
